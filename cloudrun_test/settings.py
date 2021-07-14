@@ -10,43 +10,120 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-import io
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 
-import environ
-import google.auth
-from google.cloud import secretmanager as sm
+load_dotenv()
 
-# Import the original settings from each template
-from .basesettings import *
-
-try:
-    from .local import *
-except ImportError:
-    pass
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Pull django-environ settings file, stored in Secret Manager
-SETTINGS_NAME = "cloudrun-test-settings"
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-_, project = google.auth.default()
-client = sm.SecretManagerServiceClient()
-name = f"projects/{project}/secrets/{SETTINGS_NAME}/versions/latest"
-payload = client.access_secret_version(name=name).payload.data.decode("UTF-8")
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = '^GQ+C(RpB=pB<:;([t;Rhuve+@jFzV(S.kpar[]]V!JXO_Zq3r'
 
-env = environ.Env()
-env.read_env(io.StringIO(payload))
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
-# Setting this value from django-environ
-SECRET_KEY = env("SECRET_KEY")
+ALLOWED_HOSTS = ['*']
 
-# Allow all hosts to access Django site
-ALLOWED_HOSTS = ["*"]
 
-# Default false. True allows default landing pages to be visible
-DEBUG = env("DEBUG")
+# Application definition
 
-# Set this value from django-environ
-DATABASES = {}
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+]
 
-INSTALLED_APPS += ["storages"] # for django-storages
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'cloudrun_test.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'cloudrun_test.wsgi.application'
+
+
+# Database
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+
+# Password validation
+# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+
+# Internationalization
+# https://docs.djangoproject.com/en/3.2/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'Asia/Singapore'
+
+USE_I18N = True
+
+USE_L10N = True
+
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
+
+STATIC_URL = '/static/'
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
