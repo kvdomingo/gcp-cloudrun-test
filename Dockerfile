@@ -12,4 +12,4 @@ ENV PORT 8080
 
 ENV PYTHONUNBUFFERED TRUE
 
-CMD exec gunicorn --bind 0.0.0.0:$PORT -w 1 --threads 8 --timeout 0 cloudrun_test.wsgi
+CMD exec gunicorn --bind 0.0.0.0:$PORT -w 1 --threads 8 --timeout 0 --log-file - --capture-output cloudrun_test.wsgi
